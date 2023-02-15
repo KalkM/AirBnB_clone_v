@@ -15,8 +15,6 @@ The console is the first segment of the AirBnB project at Holberton School that 
 * [Usage](#usage)
 * [Examples of use](#examples-of-use)
 * [Bugs](#bugs)
-* [Authors](#authors)
-* [License](#license)
 
 ## Environment
 This project is interpreted/tested on Ubuntu 14.04 LTS using python3 (version 3.4.3)
@@ -152,11 +150,3 @@ EOF  all  create  destroy  help  quit  show  update
 
 ## Bugs
 No known bugs at this time. 
-
-## Authors
-Alexa Orrico - [Github](https://github.com/alexaorrico) / [Twitter](https://twitter.com/alexa_orrico)  
-Jennifer Huang - [Github](https://github.com/jhuang10123) / [Twitter](https://twitter.com/earthtojhuang)
-
-Second part of Airbnb: Joann Vuong
-## License
-Public Domain. No copy write protection. 
