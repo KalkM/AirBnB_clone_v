@@ -14,7 +14,6 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
-from models import storage
 import json
 import os
 import pep8
@@ -68,27 +67,6 @@ test_file_storage.py'])
             self.assertTrue(len(func[1].__doc__) >= 1,
                             "{:s} method needs a docstring".format(func[0]))
 
-    def test_dbs_func_get(self):
-        """Test for the presence of docstrings in DBStorage methods"""
-        state = State(name="yesid")
-        storage.new(state)
-        storage.save()
-        first_state_id = list(storage.all("State").values())[0].id
-        id1 = first_state_id
-        self.assertTrue(storage.get("State", first_state_id), id1)
-
-    def test_dbs_func_count(self):
-        """Test for the presence of docstrings in DBStorage methods"""
-        num1 = storage.count("State")
-        state = State(name="yesid")
-        storage.new(state)
-        storage.save()
-        num2 = storage.count("State")
-        first_state_id = list(storage.all("State").values())[0].id
-        id1 = first_state_id
-        self.assertTrue(storage.get("State", first_state_id), id1)
-        self.assertTrue(num1 + 1, num2)
-
 
 class TestFileStorage(unittest.TestCase):
     """Test the FileStorage class"""
@@ -136,25 +114,58 @@ class TestFileStorage(unittest.TestCase):
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
 
-    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
-    def test_fs_func_get(self):
-        """Test for the presence of docstrings in DBStorage methods"""
-        state = State(name="yesid")
-        storage.new(state)
-        storage.save()
-        first_state_id = list(storage.all("State").values())[0].id
-        id1 = first_state_id
-        self.assertTrue(storage.get("State", first_state_id), id1)
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get_no_class(self):
+        """ test get with a non existing class
+        """
+        storage = FileStorage()
+        one = storage.get("NO", "09231280jdodasd")
+        self.assertEqual(one, None)
 
-    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
-    def test_fs_func_count(self):
-        """Test for the presence of docstrings in DBStorage methods"""
-        num1 = storage.count("State")
-        state = State(name="yesid")
-        storage.new(state)
-        storage.save()
-        num2 = storage.count("State")
-        first_state_id = list(storage.all("State").values())[0].id
-        id1 = first_state_id
-        self.assertTrue(storage.get("State", first_state_id), id1)
-        self.assertTrue(num1 + 1, num2)
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get_class_no_id(self):
+        """ test get if a class id doesn´t exist
+        """
+        storage = FileStorage()
+        one = storage.get("State", "09231280jdodasd")
+        self.assertEqual(one, None)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get(self):
+        """ test get return
+        """
+        storage = FileStorage()
+        first_elem = list(storage.all("State").values())[0]
+        first_state_id = first_elem.id
+        one = storage.get("State", first_state_id)
+        self.assertEqual(one, first_elem)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count_no_class(self):
+        """ test count is no class
+        """
+        storage = FileStorage()
+        counter = 0
+        dic = storage.all()
+        for elem in dic:
+            counter = counter + 1
+        self.assertEqual(counter, storage.count())
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count_fail(self):
+        """ test count if no valid class
+        """
+        storage = FileStorage()
+        counter = 0
+        self.assertEqual(counter, storage.count("NO_CLASS"))
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count(self):
+        """ test count with class user
+        """
+        storage = FileStorage()
+        counter = 0
+        dic = storage.all("User")
+        for elem in dic:
+            counter = counter + 1
+        self.assertEqual(counter, storage.count("User"))
