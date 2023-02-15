@@ -14,12 +14,10 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
-from models import storage
 import json
 import os
 import pep8
 import unittest
-import MySQLdb as SQLito
 DBStorage = db_storage.DBStorage
 classes = {"Amenity": Amenity, "City": City, "Place": Place,
            "Review": Review, "State": State, "User": User}
@@ -69,27 +67,6 @@ test_db_storage.py'])
             self.assertTrue(len(func[1].__doc__) >= 1,
                             "{:s} method needs a docstring".format(func[0]))
 
-    def test_dbs_func_get(self):
-        """Test for the presence of docstrings in DBStorage methods"""
-        state = State(name="yesid")
-        storage.new(state)
-        storage.save()
-        first_state_id = list(storage.all("State").values())
-        id1 = first_state_id
-        self.assertTrue(storage.get("State", state.id), id1)
-
-    def test_dbs_func_count(self):
-        """Test for the presence of docstrings in DBStorage methods"""
-        num1 = storage.count("State")
-        state = State(name="yesid")
-        storage.new(state)
-        storage.save()
-        num2 = storage.count("State")
-        first_state_id = list(storage.all("State").values())[0].id
-        id1 = first_state_id
-        self.assertTrue(storage.get("State", first_state_id), id1)
-        self.assertTrue(num1 + 1, num2)
-
 
 class TestFileStorage(unittest.TestCase):
     """Test the FileStorage class"""
@@ -111,24 +88,51 @@ class TestFileStorage(unittest.TestCase):
         """Test that save properly saves objects to file.json"""
 
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
-    def test_fs_func_get(self):
-        """Test for the presence of docstrings in DBStorage methods"""
-        state = State(name="yesid")
-        storage.new(state)
-        storage.save()
-        first_state_id = list(storage.all("State").values())[0].id
-        id1 = first_state_id
-        self.assertTrue(storage.get("State", first_state_id), id1)
+    def test_get_no_class(self):
+        """ test get with a non existing class
+        """
+        one = models.storage.get("NO", "09231280jdodasd")
+        self.assertEqual(one, None)
 
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
-    def test_fs_func_count(self):
-        """Test for the presence of docstrings in DBStorage methods"""
-        num1 = storage.count("State")
-        state = State(name="yesid")
-        storage.new(state)
-        storage.save()
-        num2 = storage.count("State")
-        first_state_id = list(storage.all("State").values())[0].id
-        id1 = first_state_id
-        self.assertTrue(storage.get("State", first_state_id), id1)
-        self.assertTrue(num1 + 1, num2)
+    def test_get_class_no_id(self):
+        """ test get if a class id doesn´t exist
+        """
+        one = models.storage.get("State", "09231280jdodasd")
+        self.assertEqual(one, None)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get(self):
+        """ test get return
+        """
+        state = State(name='prueba')
+        models.storage.new(state)
+        models.storage.save()
+        self.assertEqual(models.storage.get("State", state.id).id, state.id)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count_no_class(self):
+        """ test count is no class
+        """
+        counter = 0
+        dic = models.storage.all()
+        for elem in dic:
+            counter = counter + 1
+        self.assertEqual(counter, models.storage.count())
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count_fail(self):
+        """ test count if no valid class
+        """
+        counter = 0
+        self.assertEqual(counter, models.storage.count("NO_CLASS"))
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count(self):
+        """ test count with class user
+        """
+        counter = 0
+        dic = models.storage.all("User")
+        for elem in dic:
+            counter = counter + 1
+        self.assertEqual(counter, models.storage.count("User"))
