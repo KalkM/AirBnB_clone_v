@@ -1,36 +1,37 @@
 #!/usr/bin/python3
 """
-starts a Flask web application
+A python script that starts a Flask web application
 """
-
-import os
+from flask import Flask, Blueprint, abort, jsonify
 from models import storage
-from flask import Flask, jsonify
 from api.v1.views import app_views
+from os import getenv
 from flask_cors import CORS
-from flasgger import Swagger
+
+
 app = Flask(__name__)
 app.url_map.strict_slashes = False
-swagger = Swagger(app)
-
 app.register_blueprint(app_views)
-cors = CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
+CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
 
 
 @app.errorhandler(404)
-def handle_404(err):
-    """status render template for json"""
-    return jsonify({"error": "Not found"}), 404
+def page_not_found(error):
+    """
+    Function that shows a 404 error
+    """
+    return (jsonify(error="Not found"), 404)
 
 
 @app.teardown_appcontext
-def teardown_db(exception):
-    """closes the storage on teardown"""
+def teardown(exception=None):
+    """
+     Function closes the current session
+    """
     storage.close()
 
 
 if __name__ == '__main__':
-    """init of the flask app"""
-    ip = os.environ.get('HBNB_API_HOST', '0.0.0.0')
-    port = os.environ.get('HBNB_API_PORT', '5000')
-    app.run(host=ip, port=port, threaded=True)
+    h = getenv('HBNB_API_HOST')
+    p = getenv('HBNB_API_PORT')
+    app.run(host=h, port=p, threaded=True)
