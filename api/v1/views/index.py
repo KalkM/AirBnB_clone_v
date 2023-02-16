@@ -1,28 +1,29 @@
 #!/usr/bin/python3
-"""Creationg route for Blueprint
 """
-from api.v1.views import app_views
+This module contains endpoint(route) status
+"""
 from models import storage
+from flask import Flask
+from api.v1.views import app_views
 from flask import jsonify
 
 
-@app_views.route('/status')
-def response():
-    """ get status ok
+@app_views.route('/status', strict_slashes=False)
+def status():
     """
-    dic = {"status": "OK"}
-    return jsonify(dic)
+    Returns a JSON status
+    """
+    return jsonify({"status": "OK"})
 
 
-@app_views.route('/stats')
-def class_counter():
-    """ get a dictionary from count method
+@app_views.route('/stats', strict_slashes=False)
+def count():
     """
-    dic = {}
-    dic["amenities"] = storage.count("Amenity")
-    dic["cities"] = storage.count("City")
-    dic["places"] = storage.count("Place")
-    dic["reviews"] = storage.count("Review")
-    dic["states"] = storage.count("State")
-    dic["users"] = storage.count("User")
-    return jsonify(dic)
+    Retrieves the number of each objects by type
+    """
+    return jsonify({"amenities": storage.count("Amenity"),
+                    "cities": storage.count("City"),
+                    "places": storage.count("Place"),
+                    "reviews": storage.count("Review"),
+                    "states": storage.count("State"),
+                    "users": storage.count("User")})
